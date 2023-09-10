@@ -1,0 +1,23 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>VBrowser｜Logout</title>
+    <link rel="stylesheet" href="/style/basic.css">
+  </head>
+  
+  <body style="display: flex; justify-content: center; align-items: center">
+    <h1 style="color: var(--white)">Logging out...</h1>
+  </body>
+
+  <script type="module">
+    import { getCookie, setCookie } from '/script/cookie.js'
+    
+    if (await (await fetch(`/api/checkSession?session=${getCookie('session')}`)).text() === 'false') window.location.href = '/login'
+  
+    await fetch(`/api/logout?session=${getCookie('session')}`)
+
+    setCookie('session', '')
+
+    window.location.href = '/login'
+  </script>
+</html>

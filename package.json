@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "puppeteer": "^21.1.1",
+    "socket.io": "^4.7.2"
+  }
+}
