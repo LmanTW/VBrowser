@@ -1,0 +1,86 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>VBrowser｜Browser</title>
+    <link rel="stylesheet" href="/style/basic.css">
+  </head>
+
+  <style>
+    @keyframes rocket {
+      0% { transform: translateX(15px) translateY(15px) scale(1) }
+      25% { transform: translateX(-15px) translateY(-15px) scale(1.15) }
+      50% { transform: translateX(-15px) translateY(15px) scale(1) }
+      75% { transform: translateX(15px) translateY(-15px) scale(1.15) }
+      100% { transform: translateX(15px) translateY(15px) scale(1) }
+    }
+
+    .shadow {
+      -webkit-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);
+      -moz-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);
+      box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);
+    }
+  </style>
+  
+  <body>
+    <div id="loading" style="position: fixed; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100vw; height: 100vh; backdrop-filter: brightness(75%) blur(3px); transition-duration: 1s; z-index: 999">
+      <img src="/image/rocket.svg" style="width: 75px; animation: rocket 2.5s infinite">
+      <h2 style="color: var(--white); margin-top: 35px;">Launching The Page...</h2>
+    </div>
+
+    <div style="display: flex; align-items: center; background-color: var(--blue); width: 100vw; height: 75px">
+      <div style="flex: 1; display: flex">
+        <img id="button_goBack" src="/image/arrow_left.svg" style="margin-left: 25px; width: 25px; opacity: 0.5">
+        <img id="button_goFoward" src="/image/arrow_right.svg" style="margin-left: 25px; width: 25px; opacity: 0.5">
+        <img id="button_reload" src="/image/reload.svg" style="margin-left: 25px; width: 25px; opacity: 1">
+      </div>
+      <div style="flex: 2; display: flex; justify-content: center;  min-width: 225px">
+        <input id="input_url" class="input" style="font-size: 20px; padding-left: 10px; padding-right: 10px; width: calc(100% - 50px); height: 40px">
+      </div>
+      <div style="flex: 1; display: flex; flex-direction: row-reverse">
+        <img id="button_logout" src="/image/logout.svg" style="margin-right: 25px; width: 35px">
+        <h3 id="text_ping" style="color: var(--green); margin-right: 25px">0ms</h3>
+      </div>
+    </div>
+
+    <div id="toolMenu" style="position: fixed; display: flex; flex-direction: column; align-items: center; background-color: var(--blue); border-radius: 0px 5px 5px 0px; left: -50px; top: 87.5px; width: 50px; height: calc(100vh - 100px); transition-duration: 0.5s">
+      <img id="button_settings" src="/image/settings.svg" style="margin-top: 15px; width: 30px">
+      <hr style="background-color: var(--white); border: none; margin-top: 15px; width: 35px; height: 0.5px; opacity: 0.75">
+      <img id="button_bookmarks" src="/image/bookmarks.svg" style="margin-top: 10px; width: 30px">
+      <img id="button_taskMonitor" src="/image/chip.svg" style="margin-top: 30px; width: 30px">
+    </div>
+    <img id="button_toolMenu" class="shadow" src="/image/chevron_right.svg" style="position: fixed; background-color: var(--blue); border-radius: 100%; padding: 5px; left: 15px; top: calc(100vh - 52.5px); width: 30px; transition-duration: 0.5s">
+
+    <canvas id="canvas"></canvas>
+  </body>
+  
+  <script type="module">
+    import { io } from 'https://cdn.socket.io/4.4.1/socket.io.esm.min.js'
+    import connection from '/script/connection.js'
+    import { getCookie } from '/script/cookie.js'
+    import startToolMenu from '/script/toolMenu.js'
+    import startPing from '/script/ping.js'
+
+    if (await (await fetch(`/api/checkToken?token=${getCookie('token')}`)).text() === 'false') window.location.href = '/login'
+
+    const display = document.getElementById('display')
+
+    let socket = io({
+      auth: { token: getCookie('token') },
+      query: {
+        clientData: JSON.stringify({
+          displayMode: (getCookie('displayMode') === undefined) ? 'canvas' : getCookie('displayMode'),
+          resolution: (getCookie('displayMode') === undefined) ? 1 : getCookie('resolution'), 
+          width: window.innerWidth,
+          height: window.innerHeight-75
+        })
+      }
+    })
+
+    let accountData = {}
+
+    let updatePing = startPing()
+    startToolMenu(socket, accountData)
+
+    connection(socket, accountData, updatePing)
+  </script>
+</html>

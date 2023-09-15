@@ -1,0 +1,39 @@
+:root {
+  --black: #080708;
+  --white: #E6E8E6;
+  --red: #DF2935;
+  --yellow: #FDCA40;
+  --green: #3BFF38;
+  --blue: #3772FF
+}
+
+body {
+  position: fixed;
+  background-color: var(--black);
+  margin: 0px
+}
+
+.button {
+  outline: none;
+  border: none;
+  border-radius: 10px;
+  padding: 10px
+}
+
+.input {
+  outline: none;
+  background-color: var(--white);
+  border: none;
+  border-radius: 10px
+}
+
+input[type="range"] {
+  accent-color: var(--green);
+  border: none
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  outline: none;
+  color: transparent;
+  border: none
+}
